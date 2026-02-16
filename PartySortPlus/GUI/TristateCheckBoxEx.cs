@@ -1,4 +1,3 @@
-using ImGuiNET;
 using OtterGui.Widgets;
 using OtterGuiInternal.Utility;
 using PartySortPlus.GUI;

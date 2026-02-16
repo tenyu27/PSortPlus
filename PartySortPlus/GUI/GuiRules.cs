@@ -8,7 +8,6 @@ using ECommons.ImGuiMethods;
 using ECommons.ImGuiMethods.TerritorySelection;
 using ECommons.Logging;
 using ECommons.Schedulers;
-using ImGuiNET;
 using Lumina.Excel.Sheets;
 using PartySortPlus.Checkers;
 using PartySortPlus.Configuration;
@@ -109,15 +108,13 @@ namespace PartySortPlus.GUI
 
                         var moveIndex = i;
 
-                        MoveCommands.Add((rowPos, cur, delegate
+                        void BeginDraw()
                         {
                             ImGui.PushFont(UiBuilder.IconFont);
                             ImGui.Button($"{FontAwesomeIcon.ArrowsUpDownLeftRight.ToIconString()}##Move{rule.GUID}");
                             ImGui.PopFont();
                             if (ImGui.IsItemHovered())
-                            {
                                 ImGui.SetMouseCursor(ImGuiMouseCursor.ResizeAll);
-                            }
                             if (ImGui.BeginDragDropSource(ImGuiDragDropFlags.SourceNoPreviewTooltip))
                             {
                                 ImGuiDragDrop.SetDragDropPayload("MoveRule", rule.GUID);
@@ -126,12 +123,9 @@ namespace PartySortPlus.GUI
                                 ImGui.EndDragDropSource();
                             }
                             else if (CurrentDrag == rule.GUID)
-                            {
-                                InternalLog.Verbose($"Current drag reset!");
                                 CurrentDrag = null;
-                            }
-                        }, delegate { DragDropUtils.AcceptRuleDragDrop(Profile, moveIndex); }
-                        ));
+                        }
+                        MoveCommands.Add((rowPos, cur, BeginDraw, () => DragDropUtils.AcceptRuleDragDrop(Profile, moveIndex)));
 
                         // Zones
                         if (PartySortPlus.C.Cond_Territory)
@@ -176,7 +170,7 @@ namespace PartySortPlus.GUI
                                     if (OnlySelected[filterCnt] && !rule.Jobs.Contains(cond)) continue;
                                     if (ThreadLoadImageHandler.TryGetIconTextureWrap((uint)cond.GetIcon(), false, out var texture))
                                     {
-                                        ImGui.Image(texture.ImGuiHandle, iconSize);
+                                        ImGui.Image(texture.Handle, iconSize);
                                         ImGui.SameLine();
                                     }
                                     if (cond.IsUpgradeable()) ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudGrey3);
@@ -209,7 +203,7 @@ namespace PartySortPlus.GUI
                                     if (OnlySelected[filterCnt] && !rule.PartyJobs.Contains(cond)) continue;
                                     if (ThreadLoadImageHandler.TryGetIconTextureWrap((uint)cond.GetIcon(), false, out var texture))
                                     {
-                                        ImGui.Image(texture.ImGuiHandle, iconSize);
+                                        ImGui.Image(texture.Handle, iconSize);
                                         ImGui.SameLine();
                                     }
                                     if (cond.IsUpgradeable()) ImGui.PushStyleColor(ImGuiCol.Text, ImGuiColors.DalamudGrey3);
@@ -287,7 +281,7 @@ namespace PartySortPlus.GUI
             if (cond != Biome.No_biome && assemblyLocation != null &&
                 ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(assemblyLocation, "images", "biome", $"{(int)cond}.png"), out var texture))
             {
-                ImGui.Image(texture.ImGuiHandle, iconSize);
+                ImGui.Image(texture.Handle, iconSize);
                 ImGui.SameLine();
             }
             ImGuiEx.Text(nullable, arg2);

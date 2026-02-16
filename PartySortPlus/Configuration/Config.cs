@@ -1,6 +1,4 @@
-using Dalamud.Plugin.Internal.Profiles;
 using ECommons.Configuration;
-using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +15,7 @@ namespace PartySortPlus.Configuration
         public bool AllowNegativeConditions = false;
 
         public bool ShowTutorial = true;
-        public ImGuiComboFlags ComboSize = ImGuiComboFlags.HeightLarge;
+        public ImGuiNET.ImGuiComboFlags ComboSize = ImGuiNET.ImGuiComboFlags.HeightLarge;
 
         public string LastVersion = "0";
 

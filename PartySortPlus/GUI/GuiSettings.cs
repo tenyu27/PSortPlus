@@ -1,5 +1,3 @@
-using ImGuiNET;
-
 namespace PartySortPlus.GUI
 {
     public static class GuiSettings

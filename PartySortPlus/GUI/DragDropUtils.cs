@@ -1,6 +1,5 @@
 using ECommons.ImGuiMethods;
 using ECommons.Logging;
-using ImGuiNET;
 using PartySortPlus.Configuration;
 using System;
 using System.Collections.Generic;

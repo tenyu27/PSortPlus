@@ -1,6 +1,5 @@
 using ECommons.DalamudServices;
 using ECommons.ImGuiMethods;
-using ImGuiNET;
 using System.IO;
 
 namespace PartySortPlus.GUI
@@ -34,7 +33,7 @@ namespace PartySortPlus.GUI
                         var availableWidth = ImGui.GetContentRegionAvail().X;
                         var aspectRatio = (float)tex.Height / tex.Width;
                         var imageSize = new System.Numerics.Vector2(availableWidth, availableWidth * aspectRatio);
-                        ImGui.Image(tex.ImGuiHandle, imageSize);
+                        ImGui.Image(tex.Handle, imageSize);
                     }
                 }
             }
@@ -53,7 +52,7 @@ namespace PartySortPlus.GUI
                         var availableWidth = ImGui.GetContentRegionAvail().X;
                         var aspectRatio = (float)tex.Height / tex.Width;
                         var imageSize = new System.Numerics.Vector2(availableWidth, availableWidth * aspectRatio);
-                        ImGui.Image(tex.ImGuiHandle, imageSize);
+                        ImGui.Image(tex.Handle, imageSize);
                     }
                 }
             }
