@@ -37,12 +37,13 @@ jobs:
       - name: Zip plugin
         run: |
           $tag = "${{ github.event.release.tag_name }}"
+          $zipName = "PSortPlus-$tag.zip"
           $dll = Get-ChildItem -Path "PSortPlus" -Recurse -Filter "PSortPlus.dll" | Where-Object { $_.FullName -match "Release" } | Select-Object -First 1
           if (-not $dll) { throw "PSortPlus.dll not found under PSortPlus (Release)" }
           $outDir = $dll.Directory.FullName
           if (-not (Test-Path -LiteralPath $outDir)) { throw "Output dir missing: $outDir" }
-          $files = Get-ChildItem -LiteralPath $outDir -File | ForEach-Object { $_.FullName }
-          Compress-Archive -LiteralPath $files -DestinationPath "PSortPlus-$tag.zip"
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          [System.IO.Compression.ZipFile]::CreateFromDirectory($outDir, (Join-Path (Get-Location) $zipName))
 
       - name: Upload zip to release
         run: gh release upload "${{ github.event.release.tag_name }}" "PSortPlus-${{ github.event.release.tag_name }}.zip" --clobber

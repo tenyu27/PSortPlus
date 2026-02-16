@@ -228,7 +228,7 @@ namespace DynamicBridge.Gui
                                     var name = cond.ToString().Replace("_", " ");
                                     if (Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
                                     if (OnlySelected[filterCnt] && !rule.Biomes.Contains(cond)) continue;
-                                    if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "biome", $"{(int)cond}.png"), out var texture))
+                                    if (ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "images", "biome", $"{(int)cond}.png"), out var texture))
                                     {
                                         ImGui.Image(texture.ImGuiHandle, iconSize);
                                         ImGui.SameLine();
@@ -669,7 +669,7 @@ namespace DynamicBridge.Gui
         private static void DrawPlaceName(TerritoryType t, Vector4? nullable, string arg2)
         {
             var cond = t.FindBiome();
-            if (cond != Biome.No_biome && ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "res", "biome", $"{(int)cond}.png"), out var texture))
+            if (cond != Biome.No_biome && ThreadLoadImageHandler.TryGetTextureWrap(Path.Combine(Svc.PluginInterface.AssemblyLocation.DirectoryName, "images", "biome", $"{(int)cond}.png"), out var texture))
             {
                 ImGui.Image(texture.ImGuiHandle, iconSize);
                 ImGui.SameLine();
