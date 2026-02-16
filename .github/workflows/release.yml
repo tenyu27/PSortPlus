@@ -1,0 +1,50 @@
+# Build and publish plugin to a GitHub Release when a release is published.
+# Release zip is attached to the release. Plugin manifest is hosted elsewhere (e.g. PluginRepos).
+
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-and-release:
+    runs-on: windows-2022
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout (tag + submodules)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          submodules: recursive
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Download Dalamud
+        run: |
+          Invoke-WebRequest -Uri https://goatcorp.github.io/dalamud-distrib/latest.zip -OutFile latest.zip
+          New-Item -ItemType Directory -Force "$env:AppData\XIVLauncher\addon\Hooks\dev" | Out-Null
+          Expand-Archive -Force latest.zip "$env:AppData\XIVLauncher\addon\Hooks\dev"
+
+      - name: Build
+        run: dotnet build PartySortPlus.sln -c Release -p:Platform=x64 --no-incremental
+
+      - name: Zip plugin
+        run: |
+          $tag = "${{ github.event.release.tag_name }}"
+          $dll = Get-ChildItem -Path "PartySortPlus" -Recurse -Filter "PartySortPlus.dll" | Where-Object { $_.FullName -match "Release" } | Select-Object -First 1
+          if (-not $dll) { throw "PartySortPlus.dll not found under PartySortPlus (Release)" }
+          $outDir = $dll.Directory.FullName
+          if (-not (Test-Path -LiteralPath $outDir)) { throw "Output dir missing: $outDir" }
+          $files = Get-ChildItem -LiteralPath $outDir -File | ForEach-Object { $_.FullName }
+          Compress-Archive -LiteralPath $files -DestinationPath "PartySortPlus-$tag.zip"
+
+      - name: Upload zip to release
+        run: gh release upload "${{ github.event.release.tag_name }}" "PartySortPlus-${{ github.event.release.tag_name }}.zip" --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

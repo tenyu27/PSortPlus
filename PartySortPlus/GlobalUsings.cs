@@ -1,0 +1,9 @@
+global using ImGuiNET = Dalamud.Bindings.ImGui;
+global using ImGui = Dalamud.Bindings.ImGui.ImGui;
+global using ImGuiCol = Dalamud.Bindings.ImGui.ImGuiCol;
+global using ImGuiStyleVar = Dalamud.Bindings.ImGui.ImGuiStyleVar;
+global using ImGuiTableFlags = Dalamud.Bindings.ImGui.ImGuiTableFlags;
+global using ImGuiTableColumnFlags = Dalamud.Bindings.ImGui.ImGuiTableColumnFlags;
+global using ImGuiTableBgTarget = Dalamud.Bindings.ImGui.ImGuiTableBgTarget;
+global using ImGuiDragDropFlags = Dalamud.Bindings.ImGui.ImGuiDragDropFlags;
+global using ImGuiMouseCursor = Dalamud.Bindings.ImGui.ImGuiMouseCursor;
