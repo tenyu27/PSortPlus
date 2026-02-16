@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PartySortPlus.Configuration
+namespace PSortPlus.Configuration
 {
     [Serializable]
-    public class Config: IEzConfig
+    public class Config
     {
         public bool Enable = true;
         public bool Debug = false;

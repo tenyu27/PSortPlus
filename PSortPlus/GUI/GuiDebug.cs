@@ -1,15 +1,15 @@
 using ECommons.ImGuiMethods;
 using ECommons.Logging;
-using PartySortPlus;
-using PartySortPlus.Configuration;
+using PSortPlus;
+using PSortPlus.Configuration;
 
-namespace PartySortPlus.GUI
+namespace PSortPlus.GUI
 {
     public static unsafe class GuiDebug
     {
         public static void Draw()
         {
-            if (PartySortPlus.C == null) return;
+            if (PSortPlus.C == null) return;
 
             ImGui.TextColored(new System.Numerics.Vector4(0.2f, 0.6f, 1.0f, 1.0f), "Debugging options for developers. Use with caution."); // Header with colored text
             ImGui.Separator();
@@ -44,14 +44,14 @@ namespace PartySortPlus.GUI
         private static void WipeAllRules()
         {
             // Logic to wipe all rules from the profile
-            PartySortPlus.C?.GlobalProfile.Rules.Clear();
+            PSortPlus.C?.GlobalProfile.Rules.Clear();
             PluginLog.Debug("All rules wiped");
         }
 
         private static void WipeAllPresets()
         {
             // Logic to wipe all presets from the profile
-            PartySortPlus.C?.GlobalProfile.Presets.Clear();
+            PSortPlus.C?.GlobalProfile.Presets.Clear();
             PluginLog.Debug("All presets wiped");
         }
     }

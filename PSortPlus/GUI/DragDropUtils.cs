@@ -1,13 +1,13 @@
 using ECommons.ImGuiMethods;
 using ECommons.Logging;
-using PartySortPlus.Configuration;
+using PSortPlus.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PartySortPlus.GUI
+namespace PSortPlus.GUI
 {
     public static class DragDropUtils
     {

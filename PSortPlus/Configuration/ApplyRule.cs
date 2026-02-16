@@ -2,7 +2,7 @@ using ECommons.ExcelServices;
 using System;
 using System.Collections.Generic;
 
-namespace PartySortPlus.Configuration
+namespace PSortPlus.Configuration
 {
     [Serializable]
     public class ApplyRule

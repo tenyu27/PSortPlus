@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ECommons;
 
-namespace PartySortPlus.Checkers
+namespace PSortPlus.Checkers
 {
     public static class BiomeChecker
     {

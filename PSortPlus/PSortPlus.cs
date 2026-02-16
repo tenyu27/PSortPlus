@@ -1,7 +1,7 @@
 using Dalamud.Plugin;
 using ECommons.SimpleGui;
 using ECommons.Configuration;
-using PartySortPlus.Configuration;
+using PSortPlus.Configuration;
 using ECommons.Automation.LegacyTaskManager;
 using ECommons;
 using ECommons.DalamudServices;
@@ -10,7 +10,7 @@ using ECommons.Schedulers;
 using ECommons.Logging;
 using System.IO.Compression;
 using System.IO;
-using PartySortPlus.GUI;
+using PSortPlus.GUI;
 using ECommons.EzEventManager;
 using ECommons.GameHelpers;
 using System.Collections.Generic;
@@ -18,16 +18,16 @@ using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using System.Linq;
 using FFXIVClientStructs.FFXIV.Client.UI.Info;
 
-namespace PartySortPlus;
+namespace PSortPlus;
 
 /**
  * TODO LIST: 
  * - Add in usage of base classes for jobs when sorting.
  * - Figure out drag and drop issue.
  */
-public unsafe class PartySortPlus: IDalamudPlugin
+public unsafe class PSortPlus: IDalamudPlugin
 {
-    public static PartySortPlus? P;
+    public static PSortPlus? P;
     public static Config? C;
 
     public TaskManager? TaskManager;
@@ -35,7 +35,7 @@ public unsafe class PartySortPlus: IDalamudPlugin
     public bool SoftForceUpdate = false;
     public bool ForceUpdate = false;
 
-    public PartySortPlus(IDalamudPluginInterface pi)
+    public PSortPlus(IDalamudPluginInterface pi)
     {
         P = this;
         ECommonsMain.Init(pi, this, ECommons.Module.DalamudReflector);
@@ -104,7 +104,8 @@ public unsafe class PartySortPlus: IDalamudPlugin
         } 
         else if(arguments.EqualsIgnoreCaseAny("ui") || arguments.EqualsIgnoreCaseAny("config"))
         {
-            EzConfigGui.Window.IsOpen ^= true;
+            if (EzConfigGui.Window != null)
+                EzConfigGui.Window.IsOpen ^= true;
         }
         else if(arguments.EqualsIgnoreCaseAny("tutorial"))
         {

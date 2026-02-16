@@ -1,9 +1,9 @@
 using OtterGui.Widgets;
 using OtterGuiInternal.Utility;
-using PartySortPlus.GUI;
+using PSortPlus.GUI;
 using System.Numerics;  
 
-namespace PartySortPlus.GUI
+namespace PSortPlus.GUI
 {
     public class TristateCheckboxEx : TristateCheckbox
     {

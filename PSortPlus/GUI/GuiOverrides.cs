@@ -1,4 +1,4 @@
-namespace PartySortPlus.GUI
+namespace PSortPlus.GUI
 {
     public static class GuiOverrides
     {

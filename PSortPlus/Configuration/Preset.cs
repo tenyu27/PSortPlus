@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PartySortPlus.Configuration
+namespace PSortPlus.Configuration
 {
     [Serializable]
     public class Preset

@@ -2,7 +2,7 @@ using ECommons;
 using ECommons.DalamudServices;
 using ECommons.ImGuiMethods;
 using Lumina.Excel.Sheets;
-using PartySortPlus.Configuration;
+using PSortPlus.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,9 +10,9 @@ using System.Linq;
 using System.Numerics;
 using ECommons.ExcelServices;
 using ECommons.ExcelServices.TerritoryEnumeration;
-using PartySortPlus.Checkers;
+using PSortPlus.Checkers;
 
-namespace PartySortPlus
+namespace PSortPlus
 {
     public static unsafe class Utils
     {
@@ -20,17 +20,17 @@ namespace PartySortPlus
 
         public static Profile GetProfile()
         {
-            if (PartySortPlus.C != null)
+            if (PSortPlus.C != null)
             {
-                return PartySortPlus.C.GlobalProfile;
+                return PSortPlus.C.GlobalProfile;
             }
             else
             {
-                throw new InvalidOperationException("PartySortPlus.C is null. Cannot retrieve profile.");
+                throw new InvalidOperationException("PSortPlus.C is null. Cannot retrieve profile.");
             }
         }
 
-        public static string PrintRange(this IEnumerable<string> s, out string FullList, string noneStr = "Any")
+        public static string PrintRange(this IEnumerable<string> s, out string? FullList, string noneStr = "Any")
         {
             FullList = null;
             var list = s.ToArray();

@@ -9,8 +9,8 @@ using ECommons.ImGuiMethods.TerritorySelection;
 using ECommons.Logging;
 using ECommons.Schedulers;
 using Lumina.Excel.Sheets;
-using PartySortPlus.Checkers;
-using PartySortPlus.Configuration;
+using PSortPlus.Checkers;
+using PSortPlus.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,7 +19,7 @@ using System.Numerics;
 
 using Action = System.Action;
 
-namespace PartySortPlus.GUI
+namespace PSortPlus.GUI
 {
     public static class GuiRules
     {
@@ -31,7 +31,7 @@ namespace PartySortPlus.GUI
 
         public static void Draw()
         {
-            if (PartySortPlus.C != null)
+            if (PSortPlus.C != null)
             {
                 var Profile = Utils.GetProfile();
                 Profile.Rules.RemoveAll(x => x == null);
@@ -46,9 +46,9 @@ namespace PartySortPlus.GUI
                 ImGuiEx.Tooltip("Add new rule");
 
                 var active = (bool[])[
-                    PartySortPlus.C.Cond_Territory,
-                    PartySortPlus.C.Cond_Jobs,
-                    PartySortPlus.C.Cond_PartyJobs,
+                    PSortPlus.C.Cond_Territory,
+                    PSortPlus.C.Cond_Jobs,
+                    PSortPlus.C.Cond_PartyJobs,
                 ];
 
                 List<(Vector2 RowPos, Vector2 ButtonPos, Action BeginDraw, Action AcceptDraw)> MoveCommands = [];
@@ -58,9 +58,9 @@ namespace PartySortPlus.GUI
                 if (ImGui.BeginTable("##main", 3 + active.Count(x => x), ImGuiTableFlags.RowBg | ImGuiTableFlags.Borders | ImGuiTableFlags.Reorderable))
                 {
                     ImGui.TableSetupColumn("  ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed);
-                    if (PartySortPlus.C.Cond_Territory) ImGui.TableSetupColumn("Zone");
-                    if (PartySortPlus.C.Cond_Jobs) ImGui.TableSetupColumn("Job(s)");
-                    if (PartySortPlus.C.Cond_PartyJobs) ImGui.TableSetupColumn("Party Job(s)");
+                    if (PSortPlus.C.Cond_Territory) ImGui.TableSetupColumn("Zone");
+                    if (PSortPlus.C.Cond_Jobs) ImGui.TableSetupColumn("Job(s)");
+                    if (PSortPlus.C.Cond_PartyJobs) ImGui.TableSetupColumn("Party Job(s)");
                     ImGui.TableSetupColumn("Preset");
                     ImGui.TableSetupColumn(" ", ImGuiTableColumnFlags.NoResize | ImGuiTableColumnFlags.WidthFixed);
                     ImGui.TableHeadersRow();
@@ -128,7 +128,7 @@ namespace PartySortPlus.GUI
                         MoveCommands.Add((rowPos, cur, BeginDraw, () => DragDropUtils.AcceptRuleDragDrop(Profile, moveIndex)));
 
                         // Zones
-                        if (PartySortPlus.C.Cond_Territory)
+                        if (PSortPlus.C.Cond_Territory)
                         {
                             ImGui.TableNextColumn();
                             ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
@@ -136,7 +136,7 @@ namespace PartySortPlus.GUI
                             var territoryNames = rule.Territories.Select(x => ExcelTerritoryHelper.GetName(x));
                             var printRangeText = territoryNames.PrintRange(out var fullList);
 
-                            if (ImGui.BeginCombo("##zone", printRangeText, PartySortPlus.C.ComboSize))
+                            if (ImGui.BeginCombo("##zone", printRangeText, PSortPlus.C.ComboSize))
                             {
                                 new TerritorySelector(rule.Territories, (terr, s) => rule.Territories = [.. s])
                                 {
@@ -149,7 +149,7 @@ namespace PartySortPlus.GUI
                         }
 
                         // Jobs (That of the player)
-                        if (PartySortPlus.C.Cond_Jobs)
+                        if (PSortPlus.C.Cond_Jobs)
                         {
                             ImGui.TableNextColumn();
                             ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
@@ -157,7 +157,7 @@ namespace PartySortPlus.GUI
                             var jobNames = rule.Jobs.Select(x => Svc.Data.GetExcelSheet<ClassJob>().GetRow((uint)x).Abbreviation.ToString());
                             var printRangeText = jobNames.PrintRange(out var fullList);
 
-                            if (ImGui.BeginCombo("##job", printRangeText, PartySortPlus.C.ComboSize))
+                            if (ImGui.BeginCombo("##job", printRangeText, PSortPlus.C.ComboSize))
                             {
                                 FiltersSelection();
                                 foreach (var cond in Enum.GetValues<Job>().OrderByDescending(x => Svc.Data.GetExcelSheet<ClassJob>().GetRow((uint)x).Role))
@@ -184,13 +184,13 @@ namespace PartySortPlus.GUI
                         filterCnt++;
 
                         // Jobs (That of the party)
-                        if (PartySortPlus.C.Cond_PartyJobs)
+                        if (PSortPlus.C.Cond_PartyJobs)
                         {
                             ImGui.TableNextColumn();
                             ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
                             var jobNames = rule.PartyJobs.Select(x => Svc.Data.GetExcelSheet<ClassJob>().GetRow((uint)x).Abbreviation.ToString());
                             var printRangeText = jobNames.PrintRange(out var fullList);
-                            if (ImGui.BeginCombo("##partyjob", printRangeText, PartySortPlus.C.ComboSize))
+                            if (ImGui.BeginCombo("##partyjob", printRangeText, PSortPlus.C.ComboSize))
                             {
                                 FiltersSelection();
                                 foreach (var cond in Enum.GetValues<Job>().OrderByDescending(x => Svc.Data.GetExcelSheet<ClassJob>().GetRow((uint)x).Role))
@@ -220,7 +220,7 @@ namespace PartySortPlus.GUI
                         ImGui.TableNextColumn();
                         {
                             ImGuiEx.SetNextItemFullWidth();
-                            if (ImGui.BeginCombo("##glamour", rule.SelectedPresets.Count > 0 ? rule.SelectedPresets[0] : "- None -", PartySortPlus.C.ComboSize))
+                            if (ImGui.BeginCombo("##glamour", rule.SelectedPresets.Count > 0 ? rule.SelectedPresets[0] : "- None -", PSortPlus.C.ComboSize))
                             {
                                 FiltersSelection();
                                 var designs = Profile.Presets.OrderBy(x => x.Name);
@@ -291,7 +291,7 @@ namespace PartySortPlus.GUI
 
         private static void DrawSelector<T>(string name, IEnumerable<T> value, ICollection<T> values, ICollection<T> notValues)
         {
-            if (PartySortPlus.C == null) return;
+            if (PSortPlus.C == null) return;
 
             var buttonSize = ImGuiHelpers.GetButtonSize(" ");
             var size = new Vector2(buttonSize.Y);
@@ -303,7 +303,7 @@ namespace PartySortPlus.GUI
 
             if (checkbox.Draw(name, s, out s))
             {
-                if (!PartySortPlus.C.AllowNegativeConditions && s == -1)
+                if (!PSortPlus.C.AllowNegativeConditions && s == -1)
                 {
                     s = 0;
                 }

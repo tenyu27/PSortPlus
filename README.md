@@ -1,5 +1,4 @@
-# Party Sort+
-[![Downloads](https://img.shields.io/endpoint?url=https://qzysathwfhebdai6xgauhz4q7m0mzmrf.lambda-url.us-east-1.on.aws/PartySortPlus)](https://github.com/tenyu27/PartySortPlus/)
+# PSort+
 
 Automatically sort your party list in Final Fantasy XIV using rules based on zone, your job, and party composition. The plugin uses the game’s built-in `/psort` and is entirely client-sided.
 

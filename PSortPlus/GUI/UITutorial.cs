@@ -2,18 +2,18 @@ using ECommons.DalamudServices;
 using ECommons.ImGuiMethods;
 using System.IO;
 
-namespace PartySortPlus.GUI
+namespace PSortPlus.GUI
 {
     public static class UITutorial
     {
         public static void Draw()
         {
-            if (PartySortPlus.C != null)
+            if (PSortPlus.C != null)
             {
-                ImGuiEx.CheckboxInverted("Hide Tutorial!", ref PartySortPlus.C.ShowTutorial);
+                ImGuiEx.CheckboxInverted("Hide Tutorial!", ref PSortPlus.C.ShowTutorial);
             }
             ImGui.Separator();
-            ImGuiEx.TextWrapped("Welcome to Party Sort+!");
+            ImGuiEx.TextWrapped("Welcome to PSort+!");
             ImGuiEx.TextWrapped("This is a tutorial to help you get started with the plugin. This plugin allows you to dynamically sort your party according to a given preset, while limiting the sorting to take place only if you are in the correct instance, job or have the correct party member jobs for the preset to be applicable.");
             ImGui.Separator();
 

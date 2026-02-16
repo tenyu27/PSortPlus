@@ -32,13 +32,13 @@ jobs:
           Expand-Archive -Force latest.zip "$env:AppData\XIVLauncher\addon\Hooks\dev"
 
       - name: Build
-        run: dotnet build PartySortPlus.sln -c Release -p:Platform=x64 --no-incremental
+        run: dotnet build PSortPlus.sln -c Release -p:Platform=x64 --no-incremental
 
       - name: Zip plugin
         run: |
           $tag = "${{ github.event.release.tag_name }}"
-          $dll = Get-ChildItem -Path "PartySortPlus" -Recurse -Filter "PSortPlus.dll" | Where-Object { $_.FullName -match "Release" } | Select-Object -First 1
-          if (-not $dll) { throw "PSortPlus.dll not found under PartySortPlus (Release)" }
+          $dll = Get-ChildItem -Path "PSortPlus" -Recurse -Filter "PSortPlus.dll" | Where-Object { $_.FullName -match "Release" } | Select-Object -First 1
+          if (-not $dll) { throw "PSortPlus.dll not found under PSortPlus (Release)" }
           $outDir = $dll.Directory.FullName
           if (-not (Test-Path -LiteralPath $outDir)) { throw "Output dir missing: $outDir" }
           $files = Get-ChildItem -LiteralPath $outDir -File | ForEach-Object { $_.FullName }

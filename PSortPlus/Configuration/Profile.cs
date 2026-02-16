@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace PartySortPlus.Configuration
+namespace PSortPlus.Configuration
 {
     public class Profile
     {

@@ -7,7 +7,7 @@ using ECommons.SimpleGui;
 using System;
 using System.Numerics;
 
-namespace PartySortPlus.GUI
+namespace PSortPlus.GUI
 {
     public static unsafe class UI
     {
@@ -19,30 +19,34 @@ namespace PartySortPlus.GUI
             // Ensure 'resolution' is defined and initialized
             string resolution = "Configuration"; // Replace with actual logic to determine resolution if needed
 
-            // Ensure PartySortPlus.P is not null before accessing its properties
-            if (PartySortPlus.P != null)
+            // Ensure PSortPlus.P is not null before accessing its properties
+            if (PSortPlus.P != null && EzConfigGui.Window != null)
             {
-                EzConfigGui.Window.WindowName = $"{DalamudReflector.GetPluginName()} v{PartySortPlus.P.GetType().Assembly.GetName().Version} [{resolution}]###{DalamudReflector.GetPluginName()}";
+                var version = PSortPlus.P.GetType().Assembly.GetName().Version?.ToString() ?? "0.0.0";
+                EzConfigGui.Window.WindowName = $"{DalamudReflector.GetPluginName()} v{version} [{resolution}]###{DalamudReflector.GetPluginName()}";
             }
-            else
+            else if (EzConfigGui.Window != null)
             {
                 EzConfigGui.Window.WindowName = $"{DalamudReflector.GetPluginName()} [Plugin Not Initialized]";
             }
 
-            EzConfigGui.Window.RespectCloseHotkey = true;
-            EzConfigGui.Window.SetSizeConstraints(new Vector2(800, 900), new Vector2(1200, 1200));
+            if (EzConfigGui.Window != null)
+            {
+                EzConfigGui.Window.RespectCloseHotkey = true;
+                EzConfigGui.Window.SetSizeConstraints(new Vector2(800, 900), new Vector2(1200, 1200));
+            }
 
-            if (PartySortPlus.C != null)
+            if (PSortPlus.C != null)
             {
                 ImGuiEx.EzTabBar("TabsNR2", tabs: new (string? name, Action function, Vector4? color, bool child)[]
                 {
-                        (PartySortPlus.C.ShowTutorial || PartySortPlus.C.Debug ? "Tutorial" : null, UITutorial.Draw, null, true),
+                        (PSortPlus.C.ShowTutorial || PSortPlus.C.Debug ? "Tutorial" : null, UITutorial.Draw, null, true),
                         ("Rules", GuiRules.Draw, ImGuiColors.DalamudViolet, true),
                         ("Presets", GuiPresets.Draw, ImGuiColors.DalamudViolet, true),
-                        (PartySortPlus.C.Debug ? "Overrides" : null, GuiOverrides.Draw, ImGuiColors.DalamudYellow, true),
-                        (PartySortPlus.C.Debug ? "Settings" : null, GuiSettings.Draw, null, true),
+                        (PSortPlus.C.Debug ? "Overrides" : null, GuiOverrides.Draw, ImGuiColors.DalamudYellow, true),
+                        (PSortPlus.C.Debug ? "Settings" : null, GuiSettings.Draw, null, true),
                         InternalLog.ImGuiTab(),
-                        (PartySortPlus.C.Debug ? "Debug" : null, GuiDebug.Draw, ImGuiColors.DalamudGrey3, true),
+                        (PSortPlus.C.Debug ? "Debug" : null, GuiDebug.Draw, ImGuiColors.DalamudGrey3, true),
                 });
             }
 

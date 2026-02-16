@@ -5,10 +5,10 @@ using ECommons.Configuration;
 using ECommons.ExcelServices;
 using ECommons.ImGuiMethods;
 using ECommons.Logging;
-using PartySortPlus.Configuration;
+using PSortPlus.Configuration;
 using System.Numerics;
 
-namespace PartySortPlus.GUI
+namespace PSortPlus.GUI
 {
     public static class GuiPresets
     {
@@ -16,7 +16,7 @@ namespace PartySortPlus.GUI
 
         public static void Draw()
         {
-            if (PartySortPlus.C == null) return;
+            if (PSortPlus.C == null) return;
 
             using (var leftPanelStyle = ImRaii.PushStyle(ImGuiStyleVar.ItemSpacing, Vector2.Zero).Push(ImGuiStyleVar.WindowPadding, Vector2.Zero))
             {
@@ -29,11 +29,11 @@ namespace PartySortPlus.GUI
                         {
                             if (presetListChild)
                             {
-                                foreach (var preset in PartySortPlus.C.GlobalProfile.Presets)
+                                foreach (var preset in PSortPlus.C.GlobalProfile.Presets)
                                 {
-                                    if (ImGui.Selectable(preset.Name, PartySortPlus.C.GlobalProfile.SelectedPreset == preset))
+                                    if (ImGui.Selectable(preset.Name, PSortPlus.C.GlobalProfile.SelectedPreset == preset))
                                     {
-                                        PartySortPlus.C.GlobalProfile.SelectedPreset = preset;
+                                        PSortPlus.C.GlobalProfile.SelectedPreset = preset;
                                     }
                                 }
                             }
@@ -43,20 +43,20 @@ namespace PartySortPlus.GUI
                         leftPanelStyle.Push(ImGuiStyleVar.FrameRounding, 0);
                         if (ImGuiEx.IconButton(FontAwesome.Plus, "##addpreset", new Vector2(ImGui.GetContentRegionAvail().X / 2, ImGui.GetFrameHeight())))
                         {
-                            var newPresetName = $"Preset {PartySortPlus.C.GlobalProfile.Presets.Count + 1}";
+                            var newPresetName = $"Preset {PSortPlus.C.GlobalProfile.Presets.Count + 1}";
                             var newPreset = new Preset(newPresetName);
-                            PartySortPlus.C.GlobalProfile.Presets.Add(newPreset);
+                            PSortPlus.C.GlobalProfile.Presets.Add(newPreset);
                         }
 
                         ImGui.SameLine();
 
                         if (ImGuiEx.IconButton(FontAwesome.Trash, "##deletepreset", new Vector2(ImGui.GetContentRegionAvail().X, ImGui.GetFrameHeight())) && ImGui.GetIO().KeyCtrl)
                         {
-                            if (PartySortPlus.C.GlobalProfile.SelectedPreset != null)
+                            if (PSortPlus.C.GlobalProfile.SelectedPreset != null)
                             {
-                                PluginLog.Debug($"Deleting preset: {PartySortPlus.C.GlobalProfile.SelectedPreset.Name}");
-                                PartySortPlus.C.GlobalProfile.Presets.Remove(PartySortPlus.C.GlobalProfile.SelectedPreset);
-                                PartySortPlus.C.GlobalProfile.SelectedPreset = null;
+                                PluginLog.Debug($"Deleting preset: {PSortPlus.C.GlobalProfile.SelectedPreset.Name}");
+                                PSortPlus.C.GlobalProfile.Presets.Remove(PSortPlus.C.GlobalProfile.SelectedPreset);
+                                PSortPlus.C.GlobalProfile.SelectedPreset = null;
                             }
                         }
                         ImGuiEx.Tooltip("Hold CTRL+Click to delete");
@@ -74,23 +74,23 @@ namespace PartySortPlus.GUI
                 {
                     if (rightPanelChild)
                     {
-                        var selectedPreset = PartySortPlus.C.GlobalProfile.SelectedPreset;
+                        var selectedPreset = PSortPlus.C.GlobalProfile.SelectedPreset;
                         if (selectedPreset != null)
                         {
                             if (ImGuiEx.IconButton(FontAwesomeIcon.PencilAlt, "##editpresetname"))
                             {
-                                PartySortPlus.C.GlobalProfile.isEditingPresetName = true;
+                                PSortPlus.C.GlobalProfile.isEditingPresetName = true;
                             }
 
                             ImGui.SameLine();
 
-                            if (PartySortPlus.C.GlobalProfile.isEditingPresetName)
+                            if (PSortPlus.C.GlobalProfile.isEditingPresetName)
                             {
                                 ImGui.InputText("##EditName", ref selectedPreset.Name, 100);
                                 if (ImGui.IsItemDeactivated())
                                 {
                                     EzConfig.Save();
-                                    PartySortPlus.C.GlobalProfile.isEditingPresetName = false;
+                                    PSortPlus.C.GlobalProfile.isEditingPresetName = false;
                                 }
                             }
                             else
