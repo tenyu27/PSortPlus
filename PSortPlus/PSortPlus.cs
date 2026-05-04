@@ -87,7 +87,7 @@ public unsafe class PSortPlus: IDalamudPlugin
         C = null;
     }
 
-    private void TerritoryChanged(ushort id)
+    private void TerritoryChanged(uint id)
     {
         SoftForceUpdate = true;
     }

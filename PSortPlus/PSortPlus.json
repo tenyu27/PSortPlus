@@ -12,6 +12,6 @@
   ],
   "IconUrl": "https://raw.githubusercontent.com/tenyu27/PSortPlus/main/PSortPlus/images/icon.png",
   "ApplicableVersion": "any",
-  "DalamudApiLevel": 14,
+  "DalamudApiLevel": 15,
   "AssemblyVersion": "1.0.0.0"
 }
