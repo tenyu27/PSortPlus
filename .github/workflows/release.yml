@@ -42,8 +42,12 @@ jobs:
           if (-not $dll) { throw "PSortPlus.dll not found under PSortPlus (Release)" }
           $outDir = $dll.Directory.FullName
           if (-not (Test-Path -LiteralPath $outDir)) { throw "Output dir missing: $outDir" }
+          $tempDir = Join-Path (Get-Location) "temp_zip"
+          $pluginDir = Join-Path $tempDir "PSortPlus"
+          New-Item -ItemType Directory -Force $pluginDir | Out-Null
+          Copy-Item -Path "$outDir\*" -Destination $pluginDir -Recurse
           Add-Type -AssemblyName System.IO.Compression.FileSystem
-          [System.IO.Compression.ZipFile]::CreateFromDirectory($outDir, (Join-Path (Get-Location) $zipName))
+          [System.IO.Compression.ZipFile]::CreateFromDirectory($tempDir, (Join-Path (Get-Location) $zipName))
 
       - name: Upload zip to release
         run: gh release upload "${{ github.event.release.tag_name }}" "PSortPlus-${{ github.event.release.tag_name }}.zip" --clobber
