@@ -4,8 +4,9 @@
 name: Release
 
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - main
 
 jobs:
   build-and-release:
@@ -14,10 +15,9 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout (tag + submodules)
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.release.tag_name }}
           submodules: recursive
 
       - name: Install .NET
@@ -34,10 +34,17 @@ jobs:
       - name: Build
         run: dotnet build PSortPlus.sln -c Release -p:Platform=x64 --no-incremental
 
+      - name: Get Version
+        id: version
+        run: |
+          $json = Get-Content PSortPlus/PSortPlus.json -Raw | ConvertFrom-Json
+          $ver = $json.AssemblyVersion
+          Write-Output "version=$ver" >> $env:GITHUB_OUTPUT
+
       - name: Zip plugin
         run: |
-          $tag = "${{ github.event.release.tag_name }}"
-          $zipName = "PSortPlus-$tag.zip"
+          $ver = "${{ steps.version.outputs.version }}"
+          $zipName = "PSortPlus-${ver}.zip"
           $dll = Get-ChildItem -Path "PSortPlus" -Recurse -Filter "PSortPlus.dll" | Where-Object { $_.FullName -match "Release" } | Select-Object -First 1
           if (-not $dll) { throw "PSortPlus.dll not found under PSortPlus (Release)" }
           $outDir = $dll.Directory.FullName
@@ -49,7 +56,10 @@ jobs:
           Add-Type -AssemblyName System.IO.Compression.FileSystem
           [System.IO.Compression.ZipFile]::CreateFromDirectory($tempDir, (Join-Path (Get-Location) $zipName))
 
-      - name: Upload zip to release
-        run: gh release upload "${{ github.event.release.tag_name }}" "PSortPlus-${{ github.event.release.tag_name }}.zip" --clobber
+      - name: Create or Update Release
+        run: |
+          $ver = "${{ steps.version.outputs.version }}"
+          $zipName = "PSortPlus-${ver}.zip"
+          gh release create $ver $zipName --title "Release $ver" --notes "Automated build for version $ver" || gh release upload $ver $zipName --clobber
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
