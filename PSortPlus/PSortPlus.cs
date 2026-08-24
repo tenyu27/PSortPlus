@@ -82,6 +82,7 @@ public unsafe class PSortPlus: IDalamudPlugin
 
     public void Dispose()
     {
+        EzConfig.Save();
         ECommonsMain.Dispose();
         P = null;
         C = null;
@@ -135,25 +136,9 @@ public unsafe class PSortPlus: IDalamudPlugin
                 {
                     foreach (var r in C.GlobalProfile.Rules)
                     {
-                        if(r.Enabled)
+                        if (r.Enabled)
                         {
-                            var territories = r.Territories;
-                            var jobs = r.Jobs;
-                            var partyJobs = r.PartyJobs;
-                            if (C.Cond_Enabled && C.Cond_Territory && C.Cond_Roles && C.Cond_Jobs && C.Cond_PartyJobs)
-                            {
-                                if (C.AllowNegativeConditions)
-                                {
-                                    if (r.Not.Territories.Count > 0 || r.Not.Jobs.Count > 0 || r.Not.PartyJobs.Count > 0)
-                                    {
-                                        newRule.Add(r);
-                                    }
-                                }
-                                else
-                                {
-                                    newRule.Add(r);
-                                }
-                            }
+                            newRule.Add(r);
                         }
                     }
                     if (ForceUpdate || (SoftForceUpdate && newRule.Count > 0))
@@ -174,9 +159,9 @@ public unsafe class PSortPlus: IDalamudPlugin
 
                         foreach (var rule in newRule)
                         {
-                            bool skipTerritoryCheck = rule.Territories.Count == 0;
-                            bool skipJobCheck = rule.Jobs.Count == 0;
-                            bool skipPartyJobCheck = rule.PartyJobs.Count == 0;
+                            bool skipTerritoryCheck = rule.Territories.Count == 0 || !C.Cond_Territory;
+                            bool skipJobCheck = rule.Jobs.Count == 0 || !C.Cond_Jobs;
+                            bool skipPartyJobCheck = rule.PartyJobs.Count == 0 || !C.Cond_PartyJobs;
 
                             PluginLog.Debug($"Checking rule: {rule.GUID}");
 
@@ -186,7 +171,8 @@ public unsafe class PSortPlus: IDalamudPlugin
 
                             if (!skipTerritoryCheck)
                             {
-                                if (!rule.Territories.Contains(Svc.ClientState.TerritoryType))
+                                if (!rule.Territories.Contains(Svc.ClientState.TerritoryType)
+                                    || (C.AllowNegativeConditions && rule.Not.Territories.Contains(Svc.ClientState.TerritoryType)))
                                 {
                                     PluginLog.Debug($"Territory check failed.");
                                     continue;
@@ -196,7 +182,8 @@ public unsafe class PSortPlus: IDalamudPlugin
 
                             if (!skipJobCheck)
                             {
-                                if (!rule.Jobs.Contains(Player.Job))
+                                if (!rule.Jobs.Contains(Player.Job)
+                                    || (C.AllowNegativeConditions && rule.Not.Jobs.Contains(Player.Job)))
                                 {
                                     PluginLog.Debug($"Job check failed.");
                                     continue;
@@ -207,19 +194,33 @@ public unsafe class PSortPlus: IDalamudPlugin
                             if (!skipPartyJobCheck)
                             {
                                 var partyJobs = GetPartyMemberJobs();
-                                bool allRuleJobsInParty = true;
+                                bool allRequiredPresent = true;
 
                                 foreach (var requiredJob in rule.PartyJobs)
                                 {
                                     if (!partyJobs.Contains(requiredJob.ToString()))
                                     {
-                                        allRuleJobsInParty = false;
+                                        allRequiredPresent = false;
                                         PluginLog.Debug($"Party job check failed: required job {requiredJob} not present.");
                                         break;
                                     }
                                 }
 
-                                if (!allRuleJobsInParty)
+                                bool forbiddenPresent = false;
+                                if (allRequiredPresent && C.AllowNegativeConditions)
+                                {
+                                    foreach (var forbiddenJob in rule.Not.PartyJobs)
+                                    {
+                                        if (partyJobs.Contains(forbiddenJob.ToString()))
+                                        {
+                                            forbiddenPresent = true;
+                                            PluginLog.Debug($"Party job check failed: forbidden job {forbiddenJob} present.");
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (!allRequiredPresent || forbiddenPresent)
                                 {
                                     continue;
                                 }
@@ -234,7 +235,12 @@ public unsafe class PSortPlus: IDalamudPlugin
                             }
 
                             string presetNameToUse = rule.SelectedPresets[0];
-                            int presetIndex = C.GlobalProfile.Presets.FindIndex(x => x.Name.EqualsIgnoreCase(presetNameToUse));
+                            var presetCandidates = C.GlobalProfile.Presets;
+                            int presetIndex = presetCandidates.FindIndex(x => x.GUID.EqualsIgnoreCase(presetNameToUse));
+                            if (presetIndex == -1)
+                            {
+                                presetIndex = presetCandidates.FindIndex(x => x.Name.EqualsIgnoreCase(presetNameToUse));
+                            }
 
                             if (presetIndex == -1)
                             {
@@ -264,67 +270,70 @@ public unsafe class PSortPlus: IDalamudPlugin
     {
         PluginLog.Information($"Sorting party list with preset {presetToUse.Name}.");
 
-        int partyCount = (int)InfoProxyPartyMember.Instance()->GetEntryCount();
+        var members = GetPartyMembers();
+        if (members.Count == 0)
+        {
+            return;
+        }
 
-        var currentJobsSnapshot = GetPartyMemberJobs();
-        var used = new bool[partyCount];
-        var targetOrder = new List<string>();
+        var used = new bool[members.Count];
+        var desiredOrder = new List<int>(members.Count);
 
         foreach (var job in presetToUse.JobOrder)
         {
-            for (int i = 0; i < partyCount; i++)
+            for (int i = 0; i < members.Count; i++)
             {
-                if (!used[i] && currentJobsSnapshot[i].Equals(job.ToString(), StringComparison.OrdinalIgnoreCase))
+                if (!used[i] && members[i].Job.Equals(job.ToString(), StringComparison.OrdinalIgnoreCase))
                 {
-                    targetOrder.Add(currentJobsSnapshot[i]);
+                    desiredOrder.Add(members[i].Index);
                     used[i] = true;
-                    break;
                 }
             }
         }
 
-        for (int i = 0; i < partyCount; i++)
+        for (int i = 0; i < members.Count; i++)
         {
             if (!used[i])
             {
-                targetOrder.Add(currentJobsSnapshot[i]);
+                desiredOrder.Add(members[i].Index);
             }
         }
 
-        PluginLog.Debug($"Target job order: {string.Join(", ", targetOrder)}");
-        PluginLog.Debug($"Current job order: {string.Join(", ", currentJobsSnapshot)}");
+        var jobByIndex = members.ToDictionary(m => m.Index, m => m.Job);
+        PluginLog.Debug($"Target job order: {string.Join(", ", desiredOrder.Select(i => jobByIndex.TryGetValue(i, out var j) ? j : "?"))}");
+        PluginLog.Debug($"Current job order: {string.Join(", ", members.Select(m => m.Job))}");
 
-        for (int i = 0; i < targetOrder.Count; i++)
+        var order = members.Select(m => m.Index).ToList();
+
+        for (int pos = 0; pos < desiredOrder.Count; pos++)
         {
-            var currentJobs = GetPartyMemberJobs();
-            var currentIndices = GetPartyMemberJobsByIndex();
+            int cur = order.IndexOf(desiredOrder[pos]);
+            if (cur == pos) continue;
 
-            if (currentJobs[i].Equals(targetOrder[i], StringComparison.OrdinalIgnoreCase))
+            if (cur > pos)
             {
-                continue;
-            }
-
-            int swapIndex = -1;
-            for (int j = i + 1; j < partyCount; j++)
-            {
-                if (currentJobs[j].Equals(targetOrder[i], StringComparison.OrdinalIgnoreCase))
+                for (int k = cur - 1; k >= pos; k--)
                 {
-                    swapIndex = j;
-                    break;
+                    ApplyMove(order, k, k + 1);
                 }
             }
-
-            if (swapIndex == -1)
+            else
             {
-                continue;
+                ApplyMove(order, cur, pos);
             }
-
-            PluginLog.Information($"Swapping {currentJobs[swapIndex]} (index {currentIndices[swapIndex]}) into position {i}");
-            InfoProxyPartyMember.Instance()->ChangeOrder(currentIndices[swapIndex], i);
         }
     }
 
-    private List<string> GetPartyMemberJobs()
+    private void ApplyMove(List<int> order, int selectedIndex, int targetIndex)
+    {
+        PluginLog.Debug($"ChangeOrder({selectedIndex} -> {targetIndex})");
+        InfoProxyPartyMember.Instance()->ChangeOrder(selectedIndex, targetIndex);
+        var moved = order[selectedIndex];
+        order.RemoveAt(selectedIndex);
+        order.Insert(targetIndex, moved);
+    }
+
+    private List<(int Index, string Job)> GetPartyMembers()
     {
         var members = new List<(int Index, string Job)>();
 
@@ -341,23 +350,11 @@ public unsafe class PSortPlus: IDalamudPlugin
         }
 
         members.Sort((a, b) => a.Index.CompareTo(b.Index));
-
-        return members.Select(m => m.Job).ToList();
+        return members;
     }
 
-    private List<int> GetPartyMemberJobsByIndex()
+    private List<string> GetPartyMemberJobs()
     {
-        var indices = new List<int>();
-
-        foreach (ref var partyMember in AgentHUD.Instance()->PartyMembers)
-        {
-            if (partyMember.Object != null)
-            {
-                indices.Add(partyMember.Index);
-            }
-        }
-
-        indices.Sort();
-        return indices;
+        return GetPartyMembers().Select(m => m.Job).ToList();
     }
 }

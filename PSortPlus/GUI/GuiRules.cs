@@ -2,6 +2,7 @@ using Dalamud.Interface;
 using Dalamud.Interface.Colors;
 using Dalamud.Interface.Utility;
 using ECommons;
+using ECommons.Configuration;
 using ECommons.DalamudServices;
 using ECommons.ExcelServices;
 using ECommons.ImGuiMethods;
@@ -39,6 +40,7 @@ namespace PSortPlus.GUI
                 if (ImGuiEx.IconButton(FontAwesomeIcon.Plus))
                 {
                     Profile.Rules.Add(new());
+                    EzConfig.Save();
                     // Get the new rule's GUID and print it
                     PluginLog.Debug($"New rule: {Profile.Rules.Last().GUID}");
                     PluginLog.Debug($"Rule count: {Profile.Rules.Count}");
@@ -220,7 +222,8 @@ namespace PSortPlus.GUI
                         ImGui.TableNextColumn();
                         {
                             ImGuiEx.SetNextItemFullWidth();
-                            if (ImGui.BeginCombo("##glamour", rule.SelectedPresets.Count > 0 ? rule.SelectedPresets[0] : "- None -", PSortPlus.C.ComboSize))
+                            var selectedPresetRef = Profile.Presets.FirstOrDefault(p => rule.SelectedPresets.Count > 0 && p.GUID.EqualsIgnoreCase(rule.SelectedPresets[0]));
+                            if (ImGui.BeginCombo("##glamour", selectedPresetRef?.Name ?? "- None -", PSortPlus.C.ComboSize))
                             {
                                 FiltersSelection();
                                 var designs = Profile.Presets.OrderBy(x => x.Name);
@@ -228,19 +231,20 @@ namespace PSortPlus.GUI
                                 {
                                     var name = x.Name;
                                     if (Filters[filterCnt].Length > 0 && !name.Contains(Filters[filterCnt], StringComparison.OrdinalIgnoreCase)) continue;
-                                    if (OnlySelected[filterCnt] && rule.SelectedPresets.Count > 0 && rule.SelectedPresets[0] != name) continue;
+                                    if (OnlySelected[filterCnt] && selectedPresetRef?.GUID != x.GUID) continue;
 
-                                    bool selected = rule.SelectedPresets.Count > 0 && rule.SelectedPresets[0] == name;
+                                    bool selected = selectedPresetRef?.GUID == x.GUID;
                                     if (ImGui.Selectable(name, selected))
                                     {
                                         rule.SelectedPresets.Clear();
-                                        rule.SelectedPresets.Add(name);
+                                        rule.SelectedPresets.Add(x.GUID);
+                                        EzConfig.Save();
                                     }
                                 }
                                 ImGui.EndCombo();
                             }
-                            if (rule.SelectedPresets.Count > 0)
-                                ImGuiEx.Tooltip(UI.AnyNotice + rule.SelectedPresets[0]);
+                            if (selectedPresetRef != null)
+                                ImGuiEx.Tooltip(UI.AnyNotice + selectedPresetRef.Name);
                             filterCnt++;
                         }
 
@@ -248,7 +252,11 @@ namespace PSortPlus.GUI
                         ImGui.TableNextColumn();
                         if (ImGuiEx.IconButton(FontAwesomeIcon.Trash) && ImGui.GetIO().KeyCtrl)
                         {
-                            new TickScheduler(() => Profile.Rules.RemoveAll(x => x.GUID == rule.GUID));
+                            new TickScheduler(() =>
+                            {
+                                Profile.Rules.RemoveAll(x => x.GUID == rule.GUID);
+                                EzConfig.Save();
+                            });
                             PluginLog.Debug($"Deleted rule {rule.GUID}");
                         }
                         ImGuiEx.Tooltip("Hold CTRL+Click to delete");

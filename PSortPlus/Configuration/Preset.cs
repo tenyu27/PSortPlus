@@ -10,7 +10,9 @@ namespace PSortPlus.Configuration
     [Serializable]
     public class Preset
     {
-        [NonSerialized] internal string GUID = Guid.NewGuid().ToString();
+        // Serialized and used as the stable identifier rules reference presets by,
+        // so renaming or duplicating preset names cannot break rule bindings.
+        public string GUID = Guid.NewGuid().ToString();
         public string Name = "";
         public List<Job> JobOrder = new();
         public bool isPlayerAtTop = false;

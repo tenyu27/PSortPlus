@@ -1,3 +1,4 @@
+using ECommons.Configuration;
 using ECommons.ImGuiMethods;
 using ECommons.Logging;
 using PSortPlus;
@@ -45,6 +46,7 @@ namespace PSortPlus.GUI
         {
             // Logic to wipe all rules from the profile
             PSortPlus.C?.GlobalProfile.Rules.Clear();
+            EzConfig.Save();
             PluginLog.Debug("All rules wiped");
         }
 
@@ -52,6 +54,8 @@ namespace PSortPlus.GUI
         {
             // Logic to wipe all presets from the profile
             PSortPlus.C?.GlobalProfile.Presets.Clear();
+            PSortPlus.C?.GlobalProfile.SelectedPreset = null;
+            EzConfig.Save();
             PluginLog.Debug("All presets wiped");
         }
     }

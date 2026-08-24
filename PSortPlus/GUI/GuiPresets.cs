@@ -46,6 +46,8 @@ namespace PSortPlus.GUI
                             var newPresetName = $"Preset {PSortPlus.C.GlobalProfile.Presets.Count + 1}";
                             var newPreset = new Preset(newPresetName);
                             PSortPlus.C.GlobalProfile.Presets.Add(newPreset);
+                            EzConfig.Save();
+                            PSortPlus.C.GlobalProfile.SelectedPreset = newPreset;
                         }
 
                         ImGui.SameLine();
@@ -57,6 +59,7 @@ namespace PSortPlus.GUI
                                 PluginLog.Debug($"Deleting preset: {PSortPlus.C.GlobalProfile.SelectedPreset.Name}");
                                 PSortPlus.C.GlobalProfile.Presets.Remove(PSortPlus.C.GlobalProfile.SelectedPreset);
                                 PSortPlus.C.GlobalProfile.SelectedPreset = null;
+                                EzConfig.Save();
                             }
                         }
                         ImGuiEx.Tooltip("Hold CTRL+Click to delete");
