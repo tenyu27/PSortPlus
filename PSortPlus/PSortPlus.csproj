@@ -2,7 +2,7 @@
 <Project Sdk="Dalamud.NET.Sdk/15.0.0">
       <PropertyGroup>
         <AssemblyName>PSortPlus</AssemblyName>
-        <Version>1.0.0</Version>
+        <Version>1.0.0.1</Version>
         <Description>Never worry about sorting your party again!</Description>
         <PackageProjectUrl>https://github.com/tenyu27/PSortPlus</PackageProjectUrl>
         <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
