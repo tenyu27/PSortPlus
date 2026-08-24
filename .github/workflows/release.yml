@@ -49,12 +49,3 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Trigger PluginRepos update
-        run: |
-          gh api /repos/tenyu27/PluginRepos/dispatches `
-            --method POST `
-            -H "Accept: application/vnd.github.v3+json" `
-            -f event_type="update-plugins"
-        env:
-          GH_TOKEN: ${{ secrets.PAT }}
-
